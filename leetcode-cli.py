@@ -22,7 +22,7 @@ class QuestionStat:
     is_new_question: bool
     @property
     def dir_name(self):
-        return f"{self.question_id}-{self.question__title_slug}"
+        return f"{self.frontend_question_id}-{self.question__title_slug}"
     
     def src_full_pah(self,ext = "go"):
         return f"{self.question__title_slug.replace('-','_')}.{ext}"
@@ -34,17 +34,23 @@ class QuestionStat:
             # print(f"Exists {path}")
         except FileNotFoundError:
             print(f"Making {path}",file=sys.stderr)
-            os.mkdir(f"{self.question_id}-{self.question__title_slug}")
+            os.mkdir(path)
         with open(filepath,"w",encoding='utf-8') as f:
-            f.write(f"package leetcode{self.question_id}\n")
+            f.write(f"package leetcode{self.frontend_question_id}\n")
         return path
 def load_questions(question_json="problem.json"):
     
     with open(question_json) as f:
         data = json.load(f)
+    with open(question_json+".idented.json","w") as f:
+        json.dump(data,f,indent=2)
     pairs= data["stat_status_pairs"]
-    question_list = [ QuestionStat(**q["stat"]) for q in pairs ]
-    return question_list
+    q_map = {}
+    for q in pairs:
+        question = QuestionStat(**q["stat"])
+        q_map[question.frontend_question_id] = question
+    return q_map 
+
 @click.command()
 @click.option('-p','--path',help="code path of leetcode,could be set by Environment Variables LEETCODE_PATH")
 @click.option('-j','--question_json',default=lambda :os.path.expanduser('~/.config/leetcode-cli/problem.json'),help="")
@@ -57,7 +63,7 @@ def leetcode(qid:int=0,path:str=None,question_json = 'problem.json'):
         return
     question_list=load_questions(question_json)
     try:
-        q = question_list[-qid]
+        q = question_list[qid]
     except IndexError:
         print(f"Question with id {qid} Not Exists!",file=sys.stderr)
         return
