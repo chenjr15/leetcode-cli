@@ -6,5 +6,6 @@ if [[ -z $installed ]];then
     cat leetcode.env>>$HOME/.profile
     cat leetcode.bashrc>>$HOME/.bashrc
     cat leetcode.fish>>$HOME/.config/fish/config.fish
-    echo "Please relogin."
+
+    echo "Please relogin. and add leetcode-cli.py to \$PATH"
 fi
