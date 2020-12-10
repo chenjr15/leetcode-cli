@@ -46,6 +46,8 @@ class QuestionStat:
                 self.__dict__[k] = kwargs[k]
             except KeyError:
                 pass
+        # US version is int, convert it to str
+        self.frontend_question_id = str(self.frontend_question_id)
 
     @property
     def dir_name(self):
