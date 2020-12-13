@@ -1,5 +1,10 @@
 
 
 function leetcode
-    cd (leetcode-cli.py $argv)
+    set dest (leetcode-cli.py $argv)
+    if test $status = 0
+      cd $dest
+    else
+      echo $dest
+    end
 end

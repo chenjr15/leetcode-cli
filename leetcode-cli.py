@@ -90,7 +90,7 @@ def load_questions(question_json="problem.json"):
 
 
 def load_keywords(question_map: map, cache_file_path: str = "keywords_index.json") -> map:
-    print(os.getcwd(), cache_file_path)
+    #print(os.getcwd(), cache_file_path)
     keywords_map = {}
     if os.path.exists(cache_file_path):
         with open(cache_file_path) as f:
@@ -121,7 +121,6 @@ def load_keywords(question_map: map, cache_file_path: str = "keywords_index.json
               help="keywords index cache json")
 @click.option('-k', '--keyword', help="to search problem title with a single keyword")
 @click.option('-s', '--search', is_flag=True, default=False, help="to search problem title，interactive")
-@click.option('-h', '--help', is_flag=True, default=False, help="print help")
 @click.argument('qid', default=0, type=click.types.INT)
 def leetcode(qid: int = 0, path: str = None, question_json='problem.json', keyword: str = None, search=False,
              keywords_json='keywords.json', help=False):
@@ -129,22 +128,17 @@ def leetcode(qid: int = 0, path: str = None, question_json='problem.json', keywo
         os.chdir(path)
     qid = str(qid)
     question_map = load_questions(question_json)
-    if help:
-        ctx = click.get_current_context()
-        click.echo(ctx.get_help(), color=ctx.color, file=stderr)
-        return
 
     if keyword:
         keyword = keyword.lower()
         keywords_map = load_keywords(question_map, keywords_json)
         if keyword not in keywords_map:
             print("NO MATCH for", keyword, file=stderr)
-            return
+            exit(-1)
         for qid in keywords_map[keyword]:
             q = question_map[qid]
             print(q, file=stderr)
-
-        return
+        exit(-1)
     if search:
         search = input("Search:").lower()
         related = []
@@ -153,18 +147,18 @@ def leetcode(qid: int = 0, path: str = None, question_json='problem.json', keywo
                 related.append(q)
         for q in related:
             print(q, file=stderr)
-        return
+        exit(-1)
     if not qid:
         print(os.path.abspath(os.curdir))
-        return
+        exit(-1)
     try:
         q = question_map[qid]
     except KeyError:
         print(f"Question with id {qid} Not Exists!", file=stderr)
-        return
+        exit(-1)
     except IndexError:
         print(f"Question with id {qid} Not Exists!", file=stderr)
-        return
+        exit(-1)
 
     path = q.makedir()
     print(path)
